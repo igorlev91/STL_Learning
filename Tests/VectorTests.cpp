@@ -1,7 +1,7 @@
 #include "../Std/Vector.h"
 using namespace CustomStd;
 
-TEST_CASE("Vector Create empty constructor", "[Vector]")
+TEST_CASE("Vector - Constructor - Empty", "[Vector]")
 {
 	Vector<int> v;
 	REQUIRE(v.Size() == 0);
@@ -11,7 +11,7 @@ TEST_CASE("Vector Create empty constructor", "[Vector]")
 	REQUIRE(v.end() == nullptr);
 }
 
-TEST_CASE("Vector Create int constructor", "[Vector]")
+TEST_CASE("Vector - Constructor - int", "[Vector]")
 {
 	const size_t size = 5;
 	Vector<int> v(size);
@@ -32,7 +32,7 @@ TEST_CASE("Vector Create int constructor", "[Vector]")
 	}
 }
 
-TEST_CASE("Vector Create int & value constructor", "[Vector]")
+TEST_CASE("Vector - Constructor - Assign", "[Vector]")
 {
 	const size_t size = 5;
 	Vector<int> v(size, 50);
@@ -51,7 +51,7 @@ TEST_CASE("Vector Create int & value constructor", "[Vector]")
 	}
 }
 
-TEST_CASE("Vector Create initialized list constructor", "[Vector]")
+TEST_CASE("Vector - Constructor - Initializer List", "[Vector]")
 {
 	Vector<int> v = { 0, 1, 2, 3, 4 };
 	REQUIRE(v.Size() == 5);
