@@ -1,9 +1,9 @@
+
 #include "../Std/Array.h"
 using namespace CustomStd;
 
-TEST_CASE("Array ALL", "[Array]")
+TEST_CASE("Array - Constructor - Empty", "[Array]")
 {
 	Array<int, 4> arr;
-	arr[0] = 1;
-	REQUIRE(arr[0] == 1);
+	REQUIRE(arr.Size() == 4);
 }
