@@ -1,4 +1,3 @@
-
 #include "../Std/Vector.h"
 using namespace CustomStd;
 
@@ -431,7 +430,7 @@ TEST_CASE("Vector - Swap - Both filled", "[Vector]")
 	REQUIRE(v1.Capacity() == 5);
 	REQUIRE(v2.Size() == 3);
 	REQUIRE(v2.Capacity() == 3);
-	v1.Swap(v2);
+	v1.SwapVector(v2);
 	REQUIRE(v1.Size() == 3);
 	REQUIRE(v1.Capacity() == 3);
 	REQUIRE(v2.Size() == 5);
@@ -450,7 +449,7 @@ TEST_CASE("Vector - Swap - One filled", "[Vector]")
 	REQUIRE(v1.Capacity() == 5);
 	REQUIRE(v2.Size() == 0);
 	REQUIRE(v2.Capacity() == 0);
-	v1.Swap(v2);
+	v1.SwapVector(v2);
 	REQUIRE(v1.Size() == 0);
 	REQUIRE(v1.Capacity() == 0);
 	REQUIRE(v2.Size() == 5);
