@@ -1,8 +1,7 @@
-
 #include "../Std/Array.h"
 using namespace CustomStd;
 
-TEST_CASE("Array - Constructor - Empty", "[Array]")
+TEST_CASE("Array - Constructor", "[Array]")
 {
 	SECTION("Empty")
 	{

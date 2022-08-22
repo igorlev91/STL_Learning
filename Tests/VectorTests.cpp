@@ -3,7 +3,7 @@ using namespace CustomStd;
 
 #pragma region Constructors
 
-TEST_CASE("Vector - Constructor - Empty", "[Vector]")
+TEST_CASE("Vector - Constructor", "[Vector]")
 {
 	SECTION("Empty")
 	{
@@ -208,7 +208,7 @@ TEST_CASE("Vector - Assigment Operator", "[Vector]")
 	}
 }
 
-TEST_CASE("Vector - Comparison - Same size", "[Vector]")
+TEST_CASE("Vector - Comparison", "[Vector]")
 {
 	SECTION("Same size")
 	{
@@ -288,7 +288,7 @@ TEST_CASE("Vector - Resize", "[Vector]")
 	}
 }
 
-TEST_CASE("Vector - Reserve - Increase capacity", "[Vector]")
+TEST_CASE("Vector - Reserve", "[Vector]")
 {
 	SECTION("Increase capacity")
 	{
