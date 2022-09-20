@@ -1,4 +1,5 @@
 #pragma once
+#include "Casting.h"
 
 namespace CustomStd
 {
@@ -13,7 +14,7 @@ namespace CustomStd
 		{}
 
 		Pair(const T&& first, const U&& second) :
-			First(std::move(first)), Second(std::move(second))
+			First(Move(first)), Second(Move(second))
 		{}
 
 		Pair(const Pair& other) :
