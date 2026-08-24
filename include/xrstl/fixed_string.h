@@ -11,10 +11,14 @@ extern "C"
 {
 	size_t strlen(const char* str);
 	__declspec(dllimport) size_t wcslen(const wchar_t* str);
+	
 	void* memset(void* dst, int val, size_t size);
-	void* memcpy(void* dst, void const* src, size_t size);
+	wchar_t* wmemset(wchar_t* ptr, wchar_t wc, size_t num);
+
 	const void* memchr(const void* ptr, int value, size_t num);
 	const wchar_t* wmemchr(const wchar_t* ptr, wchar_t wc, size_t num);
+
+	void* memcpy(void* dst, void const* src, size_t size);
 }
 
 namespace crstl
@@ -77,6 +81,20 @@ namespace crstl
 		return (const wchar_t*)wmemchr(string, c, n);
 	}
 
+	template<typename T>
+	const T* string_rfind_char(const T* string, T c, size_t n)
+	{
+		for (const T* ptr = string; ptr != string - n; --ptr)
+		{
+			if (*ptr == c)
+			{
+				return ptr;
+			}
+		}
+
+		return nullptr;
+	}
+
 	inline crstl_constexpr void fill_char(char* destination, size_t n, char c)
 	{
 		if (n)
@@ -85,18 +103,11 @@ namespace crstl
 		}
 	}
 
-	template<typename T>
-	inline crstl_constexpr void fill_char(T* destination, size_t n, T c)
+	inline crstl_constexpr void fill_char(wchar_t* destination, size_t n, char c)
 	{
 		if (n)
 		{
-			T* ptr = destination;
-			const T* const end = destination + n;
-
-			while (ptr < end)
-			{
-				*ptr++ = c;
-			}
+			wmemset(destination, c, n);
 		}
 	}
 
@@ -386,16 +397,15 @@ namespace crstl
 		// Find a character
 		size_t find(value_type c, size_t pos = 0) const crstl_noexcept
 		{
-			const_pointer ptr = (const_pointer)string_find_char(m_data + pos, c, m_length);
+			crstl_assert(pos < m_length);
+			const_pointer ptr = (const_pointer)string_find_char(m_data + pos, c, m_length - pos);
 			return ptr ? (size_t)(ptr - m_data) : npos;
 		}
 
 		// Find a const char* string with an offset and a length
-		size_t find(const_pointer needle_string, size_t pos, size_t n) const crstl_noexcept
+		size_t find(const_pointer needle_string, size_t pos, size_t needle_length) const crstl_noexcept
 		{
-			size_t needle_length = n;
-
-			if (needle_length > m_length || pos > m_length - needle_length)
+			if (needle_string == nullptr || needle_length > m_length || pos > (m_length - needle_length))
 			{
 				return npos;
 			}
@@ -409,7 +419,9 @@ namespace crstl
 			// No point searching if length of needle is longer than the final characters of the string
 			const_pointer search_end = m_data + (m_length - needle_length) + 1;
 			const_pointer string_end = m_data + m_length;
-			for (const_pointer search_start = m_data + pos;; ++search_start)
+			const_pointer search_start = m_data + pos;
+
+			while(search_start)
 			{
 				search_start = string_find_char(search_start, *needle_string, (size_t)(search_end - search_start));
 
@@ -419,10 +431,12 @@ namespace crstl
 				}
 
 				// If we matched the first character
-				if (string_compare(search_start, (size_t)(string_end - search_start), needle_string, needle_length) == 0)
+				if (string_compare(search_start, needle_length, needle_string, needle_length) == 0)
 				{
 					return (size_t)(search_start - m_data);
 				}
+
+				++search_start;
 			}
 
 			return npos;
@@ -433,9 +447,9 @@ namespace crstl
 			return find(needle_string, pos, string_length(needle_string));
 		}
 
-		size_t find(const basic_fixed_string& string, size_t pos = 0) const crstl_noexcept
+		size_t find(const basic_fixed_string& needle_string, size_t pos = 0) const crstl_noexcept
 		{
-			return find(string.m_data, pos, string.m_length);
+			return find(needle_string.m_data, pos, needle_string.m_length);
 		}
 
 		crstl_constexpr reference front() crstl_noexcept { m_data[0]; }
@@ -456,29 +470,110 @@ namespace crstl
 
 		basic_fixed_string& replace(size_t pos, size_t length, const_pointer replace_string, size_t replace_length)
 		{
-			crstl_assert(pos < m_length);
-			crstl_assert(length <= m_length);
-
-
-			size_t replace_difference = (replace_length - length);
-
-			if (replace_length > length)
-			{
-				crstl_assert(m_length + replace_difference < kNumElementsWithZero);
-			}
-
-			if (replace_difference != 0)
-			{
-				memmove(m_data + pos + replace_length, m_data + pos + length, (m_length - (pos + length)) * kCharSize);
-			}
-
+			replace_common(pos, length, replace_length);
 			memcpy(m_data + pos, replace_string, replace_length * kCharSize);
-
-			m_length = (uint32_t)(m_length - length + replace_length);
-
-			m_data[m_length] = 0;
-
 			return *this;
+		}
+
+		basic_fixed_string& replace(size_t pos, size_t length, size_t n, value_type c)
+		{
+			replace_common(pos, length, n);
+			crstl::fill_char(m_data + pos, n, c);
+			return *this;
+		}
+
+		crstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const_pointer replace_string) crstl_noexcept
+		{
+			return replace(pos, length, replace_string, crstl::string_length(replace_string));
+		}
+
+		crstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const basic_fixed_string& replace_string) crstl_noexcept
+		{
+			return replace(pos, length, replace_string.m_data, replace_string.m_length);
+		}
+
+		crstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const basic_fixed_string& replace_string, size_t subpos, size_t sublen = npos) crstl_noexcept
+		{
+			sublen = sublen < replace_string.m_length ? sublen : replace_string.m_length;
+			return replace(pos, length, replace_string.m_data + subpos, sublen);
+		}
+
+		crstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const_pointer replace_string) crstl_noexcept
+		{
+			return replace(begin, (size_t)(end - begin), replace_string, crstl::string_length(replace_string));
+		}
+
+		crstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const_pointer replace_string, size_t replace_length) crstl_noexcept
+		{
+			return replace(begin, (size_t)(end - begin), replace_string, replace_length);
+		}
+
+		crstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const basic_fixed_string& replace_string) crstl_noexcept
+		{
+			return replace(begin, (size_t)(end - begin), replace_string.m_data, replace_string.m_length);
+		}
+
+		//-----
+		// rfind
+		//-----
+
+		size_t rfind(value_type c, size_t pos = npos) const crstl_noexcept
+		{
+			pos = pos < m_length ? pos : m_length;
+			const_pointer ptr = (const_pointer)string_rfind_char(m_data + pos, c, m_length - pos);
+			return ptr ? (size_t)(ptr - m_data) : npos;
+		}
+
+		// Find a const char* string with an offset and a length
+		size_t rfind(const_pointer needle_string, size_t pos, size_t needle_length) const crstl_noexcept
+		{
+			if (needle_string == nullptr || needle_length > m_length || pos < needle_length)
+			{
+				return npos;
+			}
+
+			// If we have an empty string, return the offset
+			if (needle_length == 0)
+			{
+				return pos;
+			}
+
+			pos = pos < m_length ? pos : m_length;
+
+			// No point searching if length of needle is longer than the final characters of the string
+			const_pointer search_end = m_data + (m_length - needle_length) + 1;
+			const_pointer string_end = m_data + m_length;
+			const_pointer search_start = m_data + pos;
+
+			while(search_start != m_data)
+			{
+				search_start = string_rfind_char(search_start, *needle_string, (size_t)(search_end - search_start));
+
+				if (!search_start)
+				{
+					return npos;
+				}
+
+				// If we matched the first character
+				if (string_compare(search_start, needle_length, needle_string, needle_length) == 0)
+				{
+					return (size_t)(search_start - m_data);
+				}
+
+				search_start--;
+			}
+
+			return npos;
+		}
+
+		size_t rfind(const_pointer needle_string, size_t pos = npos) const crstl_noexcept
+		{
+			return rfind(needle_string, pos, string_length(needle_string));
+		}
+
+		size_t rfind(const basic_fixed_string& needle_string, size_t pos = npos) const crstl_noexcept
+		{
+			return rfind(needle_string.m_data, pos, needle_string.m_length);
 		}
 
 		crstl_constexpr size_t size() const crstl_noexcept { return length(); }
@@ -516,11 +611,53 @@ namespace crstl
 			return *this;
 		}
 
+		crstl_constexpr bool operator == (const_pointer string) crstl_noexcept
+		{
+			return compare(string) == 0;
+		}
+
+		crstl_constexpr bool operator != (const_pointer string) crstl_noexcept
+		{
+			return compare(string) != 0;
+		}
+
+		crstl_constexpr bool operator == (const basic_fixed_string& string) crstl_noexcept
+		{
+			return compare(string) == 0;
+		}
+
+		crstl_constexpr bool operator != (const basic_fixed_string& string) crstl_noexcept
+		{
+			return compare(string) != 0;
+		}
+
 		T m_data[NumElements];
 
 		uint32_t m_length;
 
 	private:
+
+		crstl_constexpr void replace_common(size_t pos, size_t length, size_t replace_length)
+		{
+			crstl_assert(pos < m_length);
+			crstl_assert(length <= m_length);
+
+			size_t replace_difference = (replace_length - length);
+
+			if (replace_length > length)
+			{
+				crstl_assert(m_length + replace_difference < kNumElementsWithZero);
+			}
+
+			// Move the parts that would be stomped or leave gaps, including the null terminator
+			if (replace_difference != 0)
+			{
+				memmove(m_data + pos + replace_length, m_data + pos + length, (m_length - (pos + length) + 1) * kCharSize);
+			}
+
+			// This happens before the actual writing of data so take care not to use m_length after using this function
+			m_length = (uint32_t)(m_length - length + replace_length);
+		}
 
 		// Given a position and a length, return the length that fits the string
 		crstl_constexpr size_t clamp_length(size_t pos, size_t length) const crstl_noexcept
