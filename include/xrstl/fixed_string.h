@@ -1,115 +1,12 @@
 #pragma once
 
-#include "config.h"
+#include "string_common.h"
 
 #include <stdint.h>
 
-// Forward declaration of utility functions. These functions live in
-// <string.h
-// <wchar.h>
-extern "C"
-{
-	size_t strlen(const char* str);
-	__declspec(dllimport) size_t wcslen(const wchar_t* str);
-	
-	void* memset(void* dst, int val, size_t size);
-	wchar_t* wmemset(wchar_t* ptr, wchar_t wc, size_t num);
-
-	const void* memchr(const void* ptr, int value, size_t num);
-	const wchar_t* wmemchr(const wchar_t* ptr, wchar_t wc, size_t num);
-
-	void* memcpy(void* dst, void const* src, size_t size);
-}
-
 namespace crstl
 {
-	inline size_t string_length(const char* str)
-	{
-		return strlen(str);
-	}
-
-	inline size_t string_length(const wchar_t* str)
-	{
-		return wcslen(str);
-	}
-
-	// = 0   They compare equal
-	// < 0   Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
-	// > 0   Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
-	template<typename T>
-	inline crstl_constexpr int string_compare(const T* string1, size_t length1, const T* string2, size_t length2)
-	{
-		if (length1 == length2)
-		{
-			while (length1 != 0)
-			{
-				T char1 = *string1, char2 = *string2;
-				if (char1 != char2)
-				{
-					return char1 < char2 ? -1 : 1;
-				}
-
-				string1++;
-				string2++;
-				length1--;
-			}
-
-			return 0;
-		}
-		else if (length1 < length2)
-		{
-			return -1;
-		}
-		else
-		{
-			return 1;
-		}
-	}
-
-	size_t string_clamp_length(size_t maxLength, size_t pos, size_t length)
-	{
-		return length > maxLength - pos ? maxLength - pos : length;
-	}
-
-	inline const char* string_find_char(const char* string, char c, size_t n)
-	{
-		return (const char*)memchr(string, c, n);
-	}
-
-	inline const wchar_t* string_find_char(const wchar_t* string, wchar_t c, size_t n)
-	{
-		return (const wchar_t*)wmemchr(string, c, n);
-	}
-
-	template<typename T>
-	const T* string_rfind_char(const T* string, T c, size_t n)
-	{
-		for (const T* ptr = string; ptr != string - n; --ptr)
-		{
-			if (*ptr == c)
-			{
-				return ptr;
-			}
-		}
-
-		return nullptr;
-	}
-
-	inline crstl_constexpr void fill_char(char* destination, size_t n, char c)
-	{
-		if (n)
-		{
-			memset(destination, c, n);
-		}
-	}
-
-	inline crstl_constexpr void fill_char(wchar_t* destination, size_t n, char c)
-	{
-		if (n)
-		{
-			wmemset(destination, c, n);
-		}
-	}
+	
 
 	template<typename T, int NumElements>
 	class basic_fixed_string
@@ -153,7 +50,7 @@ namespace crstl
 			assign(begin, end);
 		}
 
-		template<size_t NumElementsOther>
+		template<int NumElementsOther>
 		basic_fixed_string(const basic_fixed_string<T, NumElementsOther>& string) crstl_noexcept
 		{
 			assign(string);
@@ -164,7 +61,7 @@ namespace crstl
 			assign(string);
 		}
 
-		template<size_t NumElementsOther>
+		template<int NumElementsOther>
 		basic_fixed_string(const basic_fixed_string<T, NumElements>& string1, const basic_fixed_string<T, NumElementsOther>& string2) crstl_noexcept
 		{
 			assign(string1);
@@ -341,6 +238,7 @@ namespace crstl
 
 		crstl_constexpr void clear() crstl_noexcept
 		{
+			m_data[0] = '\0';
 			m_length = 0;
 		}
 
@@ -462,7 +360,7 @@ namespace crstl
 
 		crstl_constexpr void pop_back() crstl_noexcept { crstl_assert(m_length > 0); m_length--; }
 
-		crstl_constexpr size_t push_back(value_type c) { append(1, c); }
+		crstl_constexpr reference push_back(value_type c) { append(1, c); return back(); }
 
 		//--------
 		// replace
@@ -667,7 +565,7 @@ namespace crstl
 	};
 
 	// Return the concatenation of two equally-sized strings
-	template<typename T, size_t NumElements>
+	template<typename T, int NumElements>
 	basic_fixed_string<T, NumElements> operator + (const basic_fixed_string<T, NumElements>& string1, const basic_fixed_string<T, NumElements>& string2)
 	{
 		return basic_fixed_string<T, NumElements>(string1, string2);
@@ -675,7 +573,7 @@ namespace crstl
 
 	// Return the concatenation of differently-sized strings. As we have to choose a size for the return string, we'll select the largest one,
 	// on the assumption that it is the most likely to hold the sum of the two values
-	template<typename T, size_t NumElements, size_t NumElementsOther>
+	template<typename T, int NumElements, int NumElementsOther>
 	basic_fixed_string<T, (NumElements > NumElementsOther ? NumElements : NumElementsOther)> operator + (const basic_fixed_string<T, NumElements>& string1, const basic_fixed_string<T, NumElementsOther>& string2)
 	{
 		return basic_fixed_string<T, (NumElements > NumElementsOther ? NumElements : NumElementsOther)>(string1, string2);
