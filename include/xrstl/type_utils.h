@@ -2,7 +2,7 @@
 
 #include "config.h"
 
-namespace crstl
+namespace xrstl
 {
 	template <typename T> struct remove_reference { typedef T type; };
 
@@ -12,35 +12,35 @@ namespace crstl
 
 
 	template <typename T>
-	crstl_constexpr T&& forward(typename crstl::remove_reference<T>::type& x) crstl_noexcept
+	xrstl_constexpr T&& forward(typename xrstl::remove_reference<T>::type& x) xrstl_noexcept
 	{
 		return static_cast<T&&>(x);
 	}
 
 	template <typename T>
-	crstl_constexpr typename crstl::remove_reference<T>::type&& move(T&& x) crstl_noexcept
+	xrstl_constexpr typename xrstl::remove_reference<T>::type&& move(T&& x) xrstl_noexcept
 	{
-		return static_cast<typename crstl::remove_reference<T>::type&&>(x);
+		return static_cast<typename xrstl::remove_reference<T>::type&&>(x);
 	}
 
 	// Swap for standard values
 	template <typename T>
-	crstl_constexpr static void swap(T& a, T& b)
+	xrstl_constexpr static void swap(T& a, T& b)
 	{
-		T temp(crstl::move(a));
-		a = crstl::move(b);
-		b = crstl::move(temp);
+		T temp(xrstl::move(a));
+		a = xrstl::move(b);
+		b = xrstl::move(temp);
 	}
 
 	template <class Iter1, class Iter2>
-	crstl_constexpr void iter_swap(Iter1 left, Iter2 right)
+	xrstl_constexpr void iter_swap(Iter1 left, Iter2 right)
 	{
 		swap(*left, *right);
 	}
 
 	// This swap is specific for arrays
 	template<typename T, int N>
-	crstl_constexpr void swap(T(&left)[N], T(&right)[N])
+	xrstl_constexpr void swap(T(&left)[N], T(&right)[N])
 	{
 		if (&left != &right)
 		{
@@ -49,7 +49,7 @@ namespace crstl
 			T* iterRight = right;
 			while (iterLeft != endLeft)
 			{
-				crstl::iter_swap(iterLeft, iterRight); // Swap the pointers
+				xrstl::iter_swap(iterLeft, iterRight); // Swap the pointers
 				++iterLeft;
 				++iterRight;
 			}
