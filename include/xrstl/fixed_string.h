@@ -11,13 +11,13 @@ namespace xrstl
 	{
 	public:
 
-		typedef T                                  value_type;
-		typedef T&                                 reference;
-		typedef const T&                           const_reference;
-		typedef T*                                 pointer;
-		typedef const T*                           const_pointer;
-		typedef T*                                 iterator;
-		typedef const T*                           const_iterator;
+		typedef T        value_type;
+		typedef T&       reference;
+		typedef const T& const_reference;
+		typedef T*       pointer;
+		typedef const T* const_pointer;
+		typedef T*       iterator;
+		typedef const T* const_iterator;
 		
 		enum
 		{
@@ -71,13 +71,13 @@ namespace xrstl
 			assign(string, subpos, sublen);
 		}
 
-		xrstl_constexpr T& at(size_t i) xrstl_noexcept
+		xrstl_constexpr reference at(size_t i) xrstl_noexcept
 		{
 			xrstl_assert(i < m_length);
 			return m_data[i];
 		}
 
-		xrstl_constexpr const T& at(size_t i) const xrstl_noexcept
+		xrstl_constexpr const_reference at(size_t i) const xrstl_noexcept
 		{
 			xrstl_assert(i < m_length);
 			return m_data[i];
@@ -225,13 +225,13 @@ namespace xrstl
 			return *this;
 		}
 
-		xrstl_constexpr T& back() xrstl_noexcept
+		xrstl_constexpr reference back() xrstl_noexcept
 		{
 			xrstl_assert(m_length > 0);
 			return m_data[m_length - 1];
 		}
 
-		xrstl_constexpr const T& back() const xrstl_noexcept
+		xrstl_constexpr const_reference back() const xrstl_noexcept
 		{
 			xrstl_assert(m_length > 0);
 			return m_data[m_length - 1];
@@ -326,41 +326,18 @@ namespace xrstl
 		// Find a const char* string with an offset and a length
 		size_t find(const_pointer needle_string, size_t pos, size_t needle_length) const xrstl_noexcept
 		{
-			if (needle_string == nullptr || needle_length > m_length || pos > (m_length - needle_length))
+			xrstl_assert(pos < m_length);
+
+			const_pointer found_string = string_find(m_data + pos, m_length - pos, needle_string, needle_length);
+
+			if (found_string)
+			{
+				return (size_t)(found_string - m_data);
+			}
+			else
 			{
 				return npos;
 			}
-
-			// If we have an empty string, return the offset
-			if (needle_length == 0)
-			{
-				return pos;
-			}
-
-			// No point searching if length of needle is longer than the final characters of the string
-			const_pointer search_end = m_data + (m_length - needle_length) + 1;
-			const_pointer string_end = m_data + m_length;
-			const_pointer search_start = m_data + pos;
-
-			while(search_start)
-			{
-				search_start = string_find_char(search_start, *needle_string, (size_t)(search_end - search_start));
-
-				if (!search_start)
-				{
-					return npos;
-				}
-
-				// If we matched the first character
-				if (string_compare(search_start, needle_length, needle_string, needle_length) == 0)
-				{
-					return (size_t)(search_start - m_data);
-				}
-
-				++search_start;
-			}
-
-			return npos;
 		}
 
 		size_t find(const_pointer needle_string, size_t pos = 0) const xrstl_noexcept
@@ -499,6 +476,23 @@ namespace xrstl
 
 		xrstl_constexpr size_t size() const xrstl_noexcept { return length(); }
 
+		xrstl_constexpr bool starts_with(value_type c) const xrstl_noexcept { return find(c, 0) == 0; }
+
+		xrstl_constexpr size_t starts_with(const_pointer needle_string, size_t needle_length) const xrstl_noexcept
+		{
+			return find(needle_string, 0, needle_length) == 0;
+		}
+
+		xrstl_constexpr size_t starts_with(const_pointer needle_string) const xrstl_noexcept
+		{
+			return find(needle_string, 0, string_length(needle_string)) == 0;
+		}
+
+		xrstl_constexpr size_t starts_with(const basic_fixed_string& needle_string) const xrstl_noexcept
+		{
+			return find(needle_string.m_data, 0, needle_string.m_length) == 0;
+		}
+
 		xrstl_constexpr basic_fixed_string substr(size_t pos, size_t length = npos) const xrstl_noexcept
 		{
 			return basic_fixed_string(*this, pos, length);
@@ -508,13 +502,13 @@ namespace xrstl
 		// Operators
 		//----------
 
-		xrstl_constexpr T& operator [](size_t i)
+		xrstl_constexpr reference operator [](size_t i)
 		{
 			xrstl_assert(i < m_length);
 			return m_data[i];
 		}
 
-		xrstl_constexpr const T& operator [](size_t i) const xrstl_noexcept
+		xrstl_constexpr const_reference operator [](size_t i) const xrstl_noexcept
 		{
 			xrstl_assert(i < m_length);
 			return m_data[i];
@@ -601,4 +595,20 @@ namespace xrstl
 	{
 		return basic_fixed_string<T, (NumElements > OtherNumElements ? NumElements : OtherNumElements)>(string1, string2);
 	}
+
+	typedef basic_fixed_string<char, 8> fixed_string8;
+	typedef basic_fixed_string<char, 16> fixed_string16;
+	typedef basic_fixed_string<char, 32> fixed_string32;
+	typedef basic_fixed_string<char, 64> fixed_string64;
+	typedef basic_fixed_string<char, 128> fixed_string128;
+	typedef basic_fixed_string<char, 256> fixed_string256;
+	typedef basic_fixed_string<char, 512> fixed_string512;
+
+	typedef basic_fixed_string<wchar_t, 8> fixed_wstring8;
+	typedef basic_fixed_string<wchar_t, 16> fixed_wstring16;
+	typedef basic_fixed_string<wchar_t, 32> fixed_wstring32;
+	typedef basic_fixed_string<wchar_t, 64> fixed_wstring64;
+	typedef basic_fixed_string<wchar_t, 128> fixed_wstring128;
+	typedef basic_fixed_string<wchar_t, 256> fixed_wstring256;
+	typedef basic_fixed_string<wchar_t, 512> fixed_wstring512;
 }

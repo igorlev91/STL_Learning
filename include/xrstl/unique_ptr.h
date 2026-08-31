@@ -53,7 +53,7 @@ namespace xrstl
 			return m_ptr;
 		}
 
-		xrstl_constexpr ~unique_ptr() xrstl_noexcept
+		~unique_ptr() xrstl_noexcept
 		{
 			destroy();
 		}
