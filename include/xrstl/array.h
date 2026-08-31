@@ -2,6 +2,8 @@
 
 #include "config.h"
 
+#include "xrstldef.h"
+
 namespace xrstl
 {
 	template<typename T, size_t N = 1>

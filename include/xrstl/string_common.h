@@ -4,7 +4,7 @@
 
 #include "config_fwd.h"
 
-#include <stdint.h>
+#include "xrstldef.h"
 
 namespace xrstl
 {

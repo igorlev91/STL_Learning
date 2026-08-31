@@ -1,8 +1,8 @@
 #pragma once
 
-#include "xrstldef.h"
-
 #include "config.h"
+
+#include "xrstldef.h"
 
 // unique_ptr
 //

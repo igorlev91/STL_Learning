@@ -2,7 +2,9 @@
 
 #include "config.h"
 
-#include <stddef.h>
+#include "xrstldef.h"
+
+#include "string_common.h"
 
 namespace xrstl
 {

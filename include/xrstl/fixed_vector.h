@@ -6,7 +6,7 @@
 
 #include "type_utils.h"
 
-#include <stdint.h>
+#include "xrstldef.h"
 
 namespace xrstl
 {
