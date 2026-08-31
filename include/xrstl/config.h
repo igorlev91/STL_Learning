@@ -1,8 +1,24 @@
 #pragma once
 
-#define crstl_constexpr constexpr
+#if defined(__cpp_if_constexpr)
 
-#define crstl_noexcept noexcept
+	#define crstl_constexpr constexpr
+
+#else
+
+	#define crstl_constexpr
+
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+
+	#define crstl_noexcept
+
+#else
+
+	#define crstl_noexcept noexcept
+
+#endif
 
 #define crstl_nodiscard [[nodiscard]]
 
@@ -39,7 +55,7 @@ inline void crstl_assert_impl(bool condition)
 {
 	if (!condition)
 	{
-		unsigned int* p = (unsigned int*)0xDEADBEEF;
+		int* p = (int*)(int)(0xDEADBEEF);
 		*p = 0;
 	}
 }
