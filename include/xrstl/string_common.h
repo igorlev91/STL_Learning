@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-namespace crstl
+namespace xrstl
 {
 	inline size_t string_length(const char* str)
 	{
@@ -22,7 +22,7 @@ namespace crstl
 	// < 0   Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 	// > 0   Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 	template<typename T>
-	inline crstl_constexpr int string_compare(const T* string1, size_t length1, const T* string2, size_t length2)
+	inline xrstl_constexpr int string_compare(const T* string1, size_t length1, const T* string2, size_t length2)
 	{
 		if (length1 == length2)
 		{
@@ -80,7 +80,7 @@ namespace crstl
 		return nullptr;
 	}
 
-	inline crstl_constexpr void fill_char(char* destination, size_t n, char c)
+	inline xrstl_constexpr void fill_char(char* destination, size_t n, char c)
 	{
 		if (n)
 		{
@@ -88,7 +88,7 @@ namespace crstl
 		}
 	}
 
-	inline crstl_constexpr void fill_char(wchar_t* destination, size_t n, char c)
+	inline xrstl_constexpr void fill_char(wchar_t* destination, size_t n, char c)
 	{
 		if (n)
 		{
@@ -225,7 +225,7 @@ namespace crstl
 		// If there's no there's not enough data
 		if (!matches || offset + encoding_length > length)
 		{
-			return crstl::UnicodeInvalid;
+			return xrstl::UnicodeInvalid;
 		}
 
 		offset++;
@@ -240,7 +240,7 @@ namespace crstl
 
 			if ((continuation & ContinuationMask) != ContinuationValue)
 			{
-				return crstl::UnicodeInvalid;
+				return xrstl::UnicodeInvalid;
 			}
 
 			codepoint <<= ContinuationCodepointBits;
@@ -254,13 +254,13 @@ namespace crstl
 		// Incorrect length used 
 		if(size_bytes != encoding_length || codepoint > UnicodeMax)
 		{
-			return crstl::UnicodeInvalid;
+			return xrstl::UnicodeInvalid;
 		}
 
 		// Surrogates are invalid Unicode codepoints, and should only be used in UTF-16
 		if (codepoint < BasicMultilingualPlaneEnd && ((codepoint & GenericSurrogateMask) == GenericSurrogateValue))
 		{
-			return crstl::UnicodeInvalid;
+			return xrstl::UnicodeInvalid;
 		}
 
 		return codepoint;
@@ -281,13 +281,13 @@ namespace crstl
 		// Unmatched low surrogate, invalid
 		if ((high & SurrogateMask) != HighSurrogateValue)
 		{
-			return crstl::UnicodeInvalid;
+			return xrstl::UnicodeInvalid;
 		}
 
 		// String ended with an unmatched high surrogate, invalid
 		if (offset >= length)
 		{
-			return crstl::UnicodeInvalid;
+			return xrstl::UnicodeInvalid;
 		}
 
 		utf16_t low = utf16[offset];
@@ -295,7 +295,7 @@ namespace crstl
 		// Unmatched high surrogate, invalid
 		if ((low & SurrogateMask) != LowSurrogateValue)
 		{
-			return crstl::UnicodeInvalid;
+			return xrstl::UnicodeInvalid;
 		}
 
 		// Two correctly matched surrogates, increase index to indicate we've consumed two characters

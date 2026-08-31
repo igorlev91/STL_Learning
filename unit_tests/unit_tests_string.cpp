@@ -1,4 +1,4 @@
-#include "crstl/fixed_string.h"
+#include "xrstl/fixed_string.h"
 #include <string>
 
 void RunUnitTestsString()
@@ -7,15 +7,15 @@ void RunUnitTestsString()
 	const wchar_t* MyWCharString = L"Hello String汉字";
 
 	std::string mystds;
-	crstl::basic_fixed_string<char, 32> myfs32;
-	crstl::basic_fixed_string<char, 32> myfs32_2("String");
-	crstl::basic_fixed_string<char, 32> myfs32_foo("foo");
-	crstl::basic_fixed_string<char, 32> myfs32_bar("bar");
+	xrstl::basic_fixed_string<char, 32> myfs32;
+	xrstl::basic_fixed_string<char, 32> myfs32_2("String");
+	xrstl::basic_fixed_string<char, 32> myfs32_foo("foo");
+	xrstl::basic_fixed_string<char, 32> myfs32_bar("bar");
 
-	crstl::basic_fixed_string<char, 8> myfs8_foo("foo");
-	crstl::basic_fixed_string<char, 8> myfs8_bar("bar");
+	xrstl::basic_fixed_string<char, 8> myfs8_foo("foo");
+	xrstl::basic_fixed_string<char, 8> myfs8_bar("bar");
 
-	crstl::basic_fixed_string<wchar_t, 32> mywfs32;
+	xrstl::basic_fixed_string<wchar_t, 32> mywfs32;
 
 	mystds = "Hello String";
 	myfs32 = "Hello String";
@@ -70,9 +70,9 @@ void RunUnitTestsString()
 	const char* u4 = u8"\U00010CFF";
 
 	size_t utf8Offset = 0;
-	crstl::codepoint_t cp = crstl::decode_utf8((const uint8_t*)u4, strlen((const char*)u4), utf8Offset);
+	xrstl::codepoint_t cp = xrstl::decode_utf8((const uint8_t*)u4, strlen((const char*)u4), utf8Offset);
 
-	myfs32.append_convert(MyWCharString, crstl::string_length(MyWCharString));
+	myfs32.append_convert(MyWCharString, xrstl::string_length(MyWCharString));
 
-	mywfs32.append_convert(MyCharString, crstl::string_length(MyCharString));
+	mywfs32.append_convert(MyCharString, xrstl::string_length(MyCharString));
 }
