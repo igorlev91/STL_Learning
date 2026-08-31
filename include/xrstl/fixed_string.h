@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-namespace crstl
+namespace xrstl
 {
 	template<typename T, int NumElements>
 	class basic_fixed_string
@@ -26,60 +26,60 @@ namespace crstl
 			kCharSize            = sizeof(T)
 		};
 
-		static const crstl_constexpr size_t npos = (size_t)-1;
+		static const xrstl_constexpr size_t npos = (size_t)-1;
 
-		basic_fixed_string() crstl_noexcept : m_length(0)
+		basic_fixed_string() xrstl_noexcept : m_length(0)
 		{
 			m_data[0] = '\0';
 		}
 
-		basic_fixed_string(const_pointer string) crstl_noexcept
+		basic_fixed_string(const_pointer string) xrstl_noexcept
 		{
 			assign(string);
 		}
 
-		basic_fixed_string(const_pointer string, size_t length) crstl_noexcept
+		basic_fixed_string(const_pointer string, size_t length) xrstl_noexcept
 		{
 			assign(string, length);
 		}
 
-		basic_fixed_string(const_pointer begin, const_pointer end) crstl_noexcept
+		basic_fixed_string(const_pointer begin, const_pointer end) xrstl_noexcept
 		{
 			assign(begin, end);
 		}
 
 		template<int OtherNumElements>
-		basic_fixed_string(const basic_fixed_string<T, OtherNumElements>& string) crstl_noexcept
+		basic_fixed_string(const basic_fixed_string<T, OtherNumElements>& string) xrstl_noexcept
 		{
 			assign(string);
 		}
 
-		basic_fixed_string(const basic_fixed_string& string) crstl_noexcept
+		basic_fixed_string(const basic_fixed_string& string) xrstl_noexcept
 		{
 			assign(string);
 		}
 
 		template<int OtherNumElements>
-		basic_fixed_string(const basic_fixed_string<T, NumElements>& string1, const basic_fixed_string<T, OtherNumElements>& string2) crstl_noexcept
+		basic_fixed_string(const basic_fixed_string<T, NumElements>& string1, const basic_fixed_string<T, OtherNumElements>& string2) xrstl_noexcept
 		{
 			assign(string1);
 			append(string2);
 		}
 
-		basic_fixed_string(const basic_fixed_string& string, size_t subpos, size_t sublen = npos) crstl_noexcept
+		basic_fixed_string(const basic_fixed_string& string, size_t subpos, size_t sublen = npos) xrstl_noexcept
 		{
 			assign(string, subpos, sublen);
 		}
 
-		crstl_constexpr T& at(size_t i) crstl_noexcept
+		xrstl_constexpr T& at(size_t i) xrstl_noexcept
 		{
-			crstl_assert(i < m_length);
+			xrstl_assert(i < m_length);
 			return m_data[i];
 		}
 
-		crstl_constexpr const T& at(size_t i) const crstl_noexcept
+		xrstl_constexpr const T& at(size_t i) const xrstl_noexcept
 		{
-			crstl_assert(i < m_length);
+			xrstl_assert(i < m_length);
 			return m_data[i];
 		}
 
@@ -88,11 +88,11 @@ namespace crstl
 		//-------
 
 		// Append a const char* string with a provided length
-		crstl_constexpr basic_fixed_string& append(const_pointer string, size_t length) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(const_pointer string, size_t length) xrstl_noexcept
 		{
 			if (length)
 			{
-				crstl_assert(m_length + length < kNumElementsWithZero);
+				xrstl_assert(m_length + length < kNumElementsWithZero);
 				memcpy(m_data + m_length, string, length * kCharSize);
 				m_length += (uint32_t)length;
 				m_data[m_length] = '\0';
@@ -101,7 +101,7 @@ namespace crstl
 		}
 
 		// Append a const char* string
-		crstl_constexpr basic_fixed_string& append(const_pointer string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(const_pointer string) xrstl_noexcept
 		{
 			size_t length = string_length(string);
 			append(string, length);
@@ -109,7 +109,7 @@ namespace crstl
 		}
 
 		// Append a const char* string defined by a begin and end
-		crstl_constexpr basic_fixed_string& append(const_pointer begin, const_pointer end) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(const_pointer begin, const_pointer end) xrstl_noexcept
 		{
 			size_t length = (size_t)(end - begin);
 			append(begin, length);
@@ -117,32 +117,32 @@ namespace crstl
 		}
 
 		template<int OtherNumElements>
-		crstl_constexpr basic_fixed_string& append(const basic_fixed_string<T, OtherNumElements>& string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(const basic_fixed_string<T, OtherNumElements>& string) xrstl_noexcept
 		{
 			append(string.m_data, string.m_length);
 			return *this;
 		}
 
 		// Append a fixed string
-		crstl_constexpr basic_fixed_string& append(const basic_fixed_string& string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(const basic_fixed_string& string) xrstl_noexcept
 		{
 			append(string.m_data, string.m_length);
 			return *this;
 		}
 
 		// Append a substring of a fixed string
-		crstl_constexpr basic_fixed_string& append(const basic_fixed_string& string, size_t subpos, size_t sublen = npos) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(const basic_fixed_string& string, size_t subpos, size_t sublen = npos) xrstl_noexcept
 		{
-			crstl_assert(string.length() + subpos + sublen < basic_fixed_string::kNumElementsWithZero);
+			xrstl_assert(string.length() + subpos + sublen < basic_fixed_string::kNumElementsWithZero);
 			append(string.m_data + subpos, sublen);
 			return *this;
 		}
 
 		// Append n copies of character c
-		crstl_constexpr basic_fixed_string& append(size_t n, value_type c) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append(size_t n, value_type c) xrstl_noexcept
 		{
-			crstl_assert(m_length + n < kNumElementsWithZero);
-			crstl::fill_char(&m_data[m_length], n, c);
+			xrstl_assert(m_length + n < kNumElementsWithZero);
+			xrstl::fill_char(&m_data[m_length], n, c);
 			return *this;
 		}
 
@@ -151,14 +151,14 @@ namespace crstl
 		//---------------
 
 		template<typename OtherCharacterType>
-		crstl_constexpr basic_fixed_string& append_convert(const OtherCharacterType* string, size_t length) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append_convert(const OtherCharacterType* string, size_t length) xrstl_noexcept
 		{
 			const OtherCharacterType* stringEnd = string + length;
 			value_type* dataStart = m_data + m_length;
 
 			size_t sizeBytes = 0;
 			bool success = decode_chunk(dataStart, dataStart + (kNumElementsWithZero - m_length), string, stringEnd, sizeBytes);
-			crstl_assert(success);
+			xrstl_assert(success);
 
 			m_length += (uint32_t)sizeBytes;
 			m_data[m_length] = '\0';
@@ -166,7 +166,7 @@ namespace crstl
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& append_convert(const_pointer string, size_t length) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& append_convert(const_pointer string, size_t length) xrstl_noexcept
 		{
 			append(string, length);
 		}
@@ -175,21 +175,21 @@ namespace crstl
 		// assign
 		//-------
 
-		crstl_constexpr basic_fixed_string& assign(const_pointer string, size_t length) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(const_pointer string, size_t length) xrstl_noexcept
 		{
 			m_length = 0;
 			append(string, length);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& assign(const_pointer string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(const_pointer string) xrstl_noexcept
 		{
 			m_length = 0;
 			append(string);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& assign(const_pointer begin, const_pointer end) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(const_pointer begin, const_pointer end) xrstl_noexcept
 		{
 			m_length = 0;
 			append(begin, end);
@@ -197,69 +197,69 @@ namespace crstl
 		}
 
 		template<int OtherNumElements>
-		crstl_constexpr basic_fixed_string& assign(const basic_fixed_string<T, OtherNumElements>& string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(const basic_fixed_string<T, OtherNumElements>& string) xrstl_noexcept
 		{
 			m_length = 0;
 			append(string);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& assign(const basic_fixed_string& string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(const basic_fixed_string& string) xrstl_noexcept
 		{
 			m_length = 0;
 			append(string);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& assign(const basic_fixed_string& string, size_t subpos, size_t sublen = npos) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(const basic_fixed_string& string, size_t subpos, size_t sublen = npos) xrstl_noexcept
 		{
 			m_length = 0;
 			append(string, subpos, sublen);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& assign(size_t n, value_type c) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& assign(size_t n, value_type c) xrstl_noexcept
 		{
 			m_length = 0;
 			append(n, c);
 			return *this;
 		}
 
-		crstl_constexpr T& back() crstl_noexcept
+		xrstl_constexpr T& back() xrstl_noexcept
 		{
-			crstl_assert(m_length > 0);
+			xrstl_assert(m_length > 0);
 			return m_data[m_length - 1];
 		}
 
-		crstl_constexpr const T& back() const crstl_noexcept
+		xrstl_constexpr const T& back() const xrstl_noexcept
 		{
-			crstl_assert(m_length > 0);
+			xrstl_assert(m_length > 0);
 			return m_data[m_length - 1];
 		}
 
-		crstl_constexpr iterator begin() crstl_noexcept { return &m_data[0]; }
-		crstl_constexpr const_iterator begin() const crstl_noexcept { return &m_data[0]; }
+		xrstl_constexpr iterator begin() xrstl_noexcept { return &m_data[0]; }
+		xrstl_constexpr const_iterator begin() const xrstl_noexcept { return &m_data[0]; }
 
-		crstl_constexpr pointer c_str() crstl_noexcept
+		xrstl_constexpr pointer c_str() xrstl_noexcept
 		{
 			return m_data;
 		}
 
-		crstl_constexpr const_pointer c_str() const crstl_noexcept
+		xrstl_constexpr const_pointer c_str() const xrstl_noexcept
 		{
 			return m_data;
 		}
 
 		// Returns the maximum size of this container, in bytes
-		crstl_constexpr size_t capacity() const crstl_noexcept
+		xrstl_constexpr size_t capacity() const xrstl_noexcept
 		{
 			return kNumElementsWithZero * kCharSize;
 		}
 
-		crstl_constexpr const_iterator cbegin() const crstl_noexcept { return &m_data[0]; }
-		crstl_constexpr const_iterator cend() const crstl_noexcept { return &m_data[0] + m_length; }
+		xrstl_constexpr const_iterator cbegin() const xrstl_noexcept { return &m_data[0]; }
+		xrstl_constexpr const_iterator cend() const xrstl_noexcept { return &m_data[0] + m_length; }
 
-		crstl_constexpr void clear() crstl_noexcept
+		xrstl_constexpr void clear() xrstl_noexcept
 		{
 			m_data[0] = '\0';
 			m_length = 0;
@@ -269,62 +269,62 @@ namespace crstl
 		// compare
 		//--------
 
-		crstl_constexpr int compare(const T* string) const crstl_noexcept
+		xrstl_constexpr int compare(const T* string) const xrstl_noexcept
 		{
-			return crstl::string_compare(m_data, m_length, string, string_length(string));
+			return xrstl::string_compare(m_data, m_length, string, string_length(string));
 		}
 
-		crstl_constexpr int compare(size_t pos, size_t length, const T* string) const crstl_noexcept
+		xrstl_constexpr int compare(size_t pos, size_t length, const T* string) const xrstl_noexcept
 		{
-			crstl_assert(pos < m_length);
-			return crstl::string_compare(m_data + pos, clamp_length(pos, length), string, string_length(string));
+			xrstl_assert(pos < m_length);
+			return xrstl::string_compare(m_data + pos, clamp_length(pos, length), string, string_length(string));
 		}
 
-		crstl_constexpr int compare(size_t pos, size_t length, const T* string, size_t subpos, size_t sublen = npos) const crstl_noexcept
+		xrstl_constexpr int compare(size_t pos, size_t length, const T* string, size_t subpos, size_t sublen = npos) const xrstl_noexcept
 		{
-			crstl_assert(pos < m_length);
-			return crstl::string_compare(m_data + pos, clamp_length(pos, length), string + subpos, crstl::string_clamp_length(string_length(string), subpos, sublen));
+			xrstl_assert(pos < m_length);
+			return xrstl::string_compare(m_data + pos, clamp_length(pos, length), string + subpos, xrstl::string_clamp_length(string_length(string), subpos, sublen));
 		}
 
-		crstl_constexpr int compare(const basic_fixed_string& string) const crstl_noexcept
+		xrstl_constexpr int compare(const basic_fixed_string& string) const xrstl_noexcept
 		{
-			return crstl::string_compare(m_data, m_length, string.m_data, string.m_length);
+			return xrstl::string_compare(m_data, m_length, string.m_data, string.m_length);
 		}
 
-		crstl_constexpr int compare(size_t pos, size_t length, const basic_fixed_string& string) const crstl_noexcept
+		xrstl_constexpr int compare(size_t pos, size_t length, const basic_fixed_string& string) const xrstl_noexcept
 		{
-			crstl_assert(pos < m_length);
-			return crstl::string_compare(m_data + pos, clamp_length(pos, length), string.m_data, string.m_length);
+			xrstl_assert(pos < m_length);
+			return xrstl::string_compare(m_data + pos, clamp_length(pos, length), string.m_data, string.m_length);
 		}
 
-		crstl_constexpr int compare(size_t pos, size_t length, const basic_fixed_string& string, size_t subpos, size_t sublen = npos) const crstl_noexcept
+		xrstl_constexpr int compare(size_t pos, size_t length, const basic_fixed_string& string, size_t subpos, size_t sublen = npos) const xrstl_noexcept
 		{
-			crstl_assert(pos < m_length);
-			return crstl::string_compare(m_data + pos, clamp_length(pos, length), string.m_data + subpos, string.clamp_length(subpos, sublen));
+			xrstl_assert(pos < m_length);
+			return xrstl::string_compare(m_data + pos, clamp_length(pos, length), string.m_data + subpos, string.clamp_length(subpos, sublen));
 		}
 
-		crstl_constexpr pointer data() crstl_noexcept { return c_str(); }
-		crstl_constexpr const_pointer data() const crstl_noexcept { return c_str(); }
+		xrstl_constexpr pointer data() xrstl_noexcept { return c_str(); }
+		xrstl_constexpr const_pointer data() const xrstl_noexcept { return c_str(); }
 
-		crstl_constexpr bool empty() const crstl_noexcept { return m_length == 0; }
+		xrstl_constexpr bool empty() const xrstl_noexcept { return m_length == 0; }
 
-		crstl_constexpr iterator end() crstl_noexcept { return &m_data[0] + m_length; }
-		crstl_constexpr const_iterator end() const crstl_noexcept { return &m_data[0] + m_length; }
+		xrstl_constexpr iterator end() xrstl_noexcept { return &m_data[0] + m_length; }
+		xrstl_constexpr const_iterator end() const xrstl_noexcept { return &m_data[0] + m_length; }
 
 		//-----
 		// find
 		//-----
 
 		// Find a character
-		size_t find(value_type c, size_t pos = 0) const crstl_noexcept
+		size_t find(value_type c, size_t pos = 0) const xrstl_noexcept
 		{
-			crstl_assert(pos < m_length);
+			xrstl_assert(pos < m_length);
 			const_pointer ptr = (const_pointer)string_find_char(m_data + pos, c, m_length - pos);
 			return ptr ? (size_t)(ptr - m_data) : npos;
 		}
 
 		// Find a const char* string with an offset and a length
-		size_t find(const_pointer needle_string, size_t pos, size_t needle_length) const crstl_noexcept
+		size_t find(const_pointer needle_string, size_t pos, size_t needle_length) const xrstl_noexcept
 		{
 			if (needle_string == nullptr || needle_length > m_length || pos > (m_length - needle_length))
 			{
@@ -363,27 +363,27 @@ namespace crstl
 			return npos;
 		}
 
-		size_t find(const_pointer needle_string, size_t pos = 0) const crstl_noexcept
+		size_t find(const_pointer needle_string, size_t pos = 0) const xrstl_noexcept
 		{
 			return find(needle_string, pos, string_length(needle_string));
 		}
 
-		size_t find(const basic_fixed_string& needle_string, size_t pos = 0) const crstl_noexcept
+		size_t find(const basic_fixed_string& needle_string, size_t pos = 0) const xrstl_noexcept
 		{
 			return find(needle_string.m_data, pos, needle_string.m_length);
 		}
 
-		crstl_constexpr reference front() crstl_noexcept { m_data[0]; }
-		crstl_constexpr const_reference front() const crstl_noexcept { m_data[0]; }
+		xrstl_constexpr reference front() xrstl_noexcept { m_data[0]; }
+		xrstl_constexpr const_reference front() const xrstl_noexcept { m_data[0]; }
 
 		// Returns the length of the string, in terms of number of characters
-		crstl_constexpr size_t length() const crstl_noexcept { return m_length; }
+		xrstl_constexpr size_t length() const xrstl_noexcept { return m_length; }
 
-		crstl_constexpr size_t max_size() const crstl_noexcept { return kNumElements; }
+		xrstl_constexpr size_t max_size() const xrstl_noexcept { return kNumElements; }
 
-		crstl_constexpr void pop_back() crstl_noexcept { crstl_assert(m_length > 0); m_length--; }
+		xrstl_constexpr void pop_back() xrstl_noexcept { xrstl_assert(m_length > 0); m_length--; }
 
-		crstl_constexpr reference push_back(value_type c) { append(1, c); return back(); }
+		xrstl_constexpr reference push_back(value_type c) { append(1, c); return back(); }
 
 		//--------
 		// replace
@@ -399,37 +399,37 @@ namespace crstl
 		basic_fixed_string& replace(size_t pos, size_t length, size_t n, value_type c)
 		{
 			replace_common(pos, length, n);
-			crstl::fill_char(m_data + pos, n, c);
+			xrstl::fill_char(m_data + pos, n, c);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const_pointer replace_string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const_pointer replace_string) xrstl_noexcept
 		{
-			return replace(pos, length, replace_string, crstl::string_length(replace_string));
+			return replace(pos, length, replace_string, xrstl::string_length(replace_string));
 		}
 
-		crstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const basic_fixed_string& replace_string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const basic_fixed_string& replace_string) xrstl_noexcept
 		{
 			return replace(pos, length, replace_string.m_data, replace_string.m_length);
 		}
 
-		crstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const basic_fixed_string& replace_string, size_t subpos, size_t sublen = npos) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& replace(size_t pos, size_t length, const basic_fixed_string& replace_string, size_t subpos, size_t sublen = npos) xrstl_noexcept
 		{
 			sublen = sublen < replace_string.m_length ? sublen : replace_string.m_length;
 			return replace(pos, length, replace_string.m_data + subpos, sublen);
 		}
 
-		crstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const_pointer replace_string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const_pointer replace_string) xrstl_noexcept
 		{
-			return replace(begin, (size_t)(end - begin), replace_string, crstl::string_length(replace_string));
+			return replace(begin, (size_t)(end - begin), replace_string, xrstl::string_length(replace_string));
 		}
 
-		crstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const_pointer replace_string, size_t replace_length) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const_pointer replace_string, size_t replace_length) xrstl_noexcept
 		{
 			return replace(begin, (size_t)(end - begin), replace_string, replace_length);
 		}
 
-		crstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const basic_fixed_string& replace_string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& replace(const_pointer begin, const_pointer end, const basic_fixed_string& replace_string) xrstl_noexcept
 		{
 			return replace(begin, (size_t)(end - begin), replace_string.m_data, replace_string.m_length);
 		}
@@ -438,7 +438,7 @@ namespace crstl
 		// rfind
 		//-----
 
-		size_t rfind(value_type c, size_t pos = npos) const crstl_noexcept
+		size_t rfind(value_type c, size_t pos = npos) const xrstl_noexcept
 		{
 			pos = pos < m_length ? pos : m_length;
 			const_pointer ptr = (const_pointer)string_rfind_char(m_data + pos, c, m_length - pos);
@@ -446,7 +446,7 @@ namespace crstl
 		}
 
 		// Find a const char* string with an offset and a length
-		size_t rfind(const_pointer needle_string, size_t pos, size_t needle_length) const crstl_noexcept
+		size_t rfind(const_pointer needle_string, size_t pos, size_t needle_length) const xrstl_noexcept
 		{
 			if (needle_string == nullptr || needle_length > m_length || pos < needle_length)
 			{
@@ -487,19 +487,19 @@ namespace crstl
 			return npos;
 		}
 
-		size_t rfind(const_pointer needle_string, size_t pos = npos) const crstl_noexcept
+		size_t rfind(const_pointer needle_string, size_t pos = npos) const xrstl_noexcept
 		{
 			return rfind(needle_string, pos, string_length(needle_string));
 		}
 
-		size_t rfind(const basic_fixed_string& needle_string, size_t pos = npos) const crstl_noexcept
+		size_t rfind(const basic_fixed_string& needle_string, size_t pos = npos) const xrstl_noexcept
 		{
 			return rfind(needle_string.m_data, pos, needle_string.m_length);
 		}
 
-		crstl_constexpr size_t size() const crstl_noexcept { return length(); }
+		xrstl_constexpr size_t size() const xrstl_noexcept { return length(); }
 
-		crstl_constexpr basic_fixed_string substr(size_t pos, size_t length = npos) const crstl_noexcept
+		xrstl_constexpr basic_fixed_string substr(size_t pos, size_t length = npos) const xrstl_noexcept
 		{
 			return basic_fixed_string(*this, pos, length);
 		}
@@ -508,46 +508,46 @@ namespace crstl
 		// Operators
 		//----------
 
-		crstl_constexpr T& operator [](size_t i)
+		xrstl_constexpr T& operator [](size_t i)
 		{
-			crstl_assert(i < m_length);
+			xrstl_assert(i < m_length);
 			return m_data[i];
 		}
 
-		crstl_constexpr const T& operator [](size_t i) const crstl_noexcept
+		xrstl_constexpr const T& operator [](size_t i) const xrstl_noexcept
 		{
-			crstl_assert(i < m_length);
+			xrstl_assert(i < m_length);
 			return m_data[i];
 		}
 
-		crstl_constexpr basic_fixed_string& operator += (const basic_fixed_string& string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& operator += (const basic_fixed_string& string) xrstl_noexcept
 		{
 			append(string);
 			return *this;
 		}
 
-		crstl_constexpr basic_fixed_string& operator += (const_pointer string) crstl_noexcept
+		xrstl_constexpr basic_fixed_string& operator += (const_pointer string) xrstl_noexcept
 		{
 			append(string);
 			return *this;
 		}
 
-		crstl_constexpr bool operator == (const_pointer string) crstl_noexcept
+		xrstl_constexpr bool operator == (const_pointer string) xrstl_noexcept
 		{
 			return compare(string) == 0;
 		}
 
-		crstl_constexpr bool operator != (const_pointer string) crstl_noexcept
+		xrstl_constexpr bool operator != (const_pointer string) xrstl_noexcept
 		{
 			return compare(string) != 0;
 		}
 
-		crstl_constexpr bool operator == (const basic_fixed_string& string) crstl_noexcept
+		xrstl_constexpr bool operator == (const basic_fixed_string& string) xrstl_noexcept
 		{
 			return compare(string) == 0;
 		}
 
-		crstl_constexpr bool operator != (const basic_fixed_string& string) crstl_noexcept
+		xrstl_constexpr bool operator != (const basic_fixed_string& string) xrstl_noexcept
 		{
 			return compare(string) != 0;
 		}
@@ -558,16 +558,16 @@ namespace crstl
 
 	private:
 
-		crstl_constexpr void replace_common(size_t pos, size_t length, size_t replace_length)
+		xrstl_constexpr void replace_common(size_t pos, size_t length, size_t replace_length)
 		{
-			crstl_assert(pos < m_length);
-			crstl_assert(length <= m_length);
+			xrstl_assert(pos < m_length);
+			xrstl_assert(length <= m_length);
 
 			size_t replace_difference = (replace_length - length);
 
 			if (replace_length > length)
 			{
-				crstl_assert(m_length + replace_difference < kNumElementsWithZero);
+				xrstl_assert(m_length + replace_difference < kNumElementsWithZero);
 			}
 
 			// Move the parts that would be stomped or leave gaps, including the null terminator
@@ -581,9 +581,9 @@ namespace crstl
 		}
 
 		// Given a position and a length, return the length that fits the string
-		crstl_constexpr size_t clamp_length(size_t pos, size_t length) const crstl_noexcept
+		xrstl_constexpr size_t clamp_length(size_t pos, size_t length) const xrstl_noexcept
 		{
-			return crstl::string_clamp_length(m_length, pos, length);
+			return xrstl::string_clamp_length(m_length, pos, length);
 		}
 	};
 

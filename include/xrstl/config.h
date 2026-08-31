@@ -2,29 +2,29 @@
 
 #if defined(__cpp_if_constexpr)
 
-	#define crstl_constexpr constexpr
+	#define xrstl_constexpr constexpr
 
 #else
 
-	#define crstl_constexpr
+	#define xrstl_constexpr
 
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
 
-	#define crstl_noexcept
+	#define xrstl_noexcept
 
 #else
 
-	#define crstl_noexcept noexcept
+	#define xrstl_noexcept noexcept
 
 #endif
 
-#define crstl_nodiscard [[nodiscard]]
+#define xrstl_nodiscard [[nodiscard]]
 
 #if defined(__cpp_if_constexpr)
 
-	#define crstl_constexpr_if(x) if constexpr(x)
+	#define xrstl_constexpr_if(x) if constexpr(x)
 
 #else
 
@@ -33,7 +33,7 @@
 		// warning C4127: conditional expression is constant
 		// Disable because we always use these in a template context
 		// Builds that don't support constexpr optimize them away
-		#define crstl_constexpr_if(x) \
+		#define xrstl_constexpr_if(x) \
 		__pragma(warning(push)) \
 		__pragma(warning(disable : 4127)) \
 		if(x) \
@@ -41,17 +41,20 @@
 
 	#else
 
-		#define crstl_constexpr_if(x) if(x)
+		#define xrstl_constexpr_if(x) if(x)
 
 	#endif
 
 #endif
 
-#define CRSTL_ENABLE_ASSERT
+#define xrstl_ENABLE_ASSERT
+#if __cplusplus == 201402L || _MSVC_LANG == 201402L
+	#define xrstl_VARIADIC_TEMPLATES
+#endif
 
-#if defined(CRSTL_ENABLE_ASSERT)
+#if defined(xrstl_ENABLE_ASSERT)
 
-inline void crstl_assert_impl(bool condition)
+inline void xrstl_assert_impl(bool condition)
 {
 	if (!condition)
 	{
@@ -60,10 +63,10 @@ inline void crstl_assert_impl(bool condition)
 	}
 }
 
-#define crstl_assert(x) crstl_assert_impl((x))
+#define xrstl_assert(x) xrstl_assert_impl((x))
 
 #else
 
-#define crstl_assert(x)
+#define xrstl_assert(x)
 
 #endif

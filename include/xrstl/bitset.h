@@ -4,7 +4,7 @@
 
 #include "stdint.h"
 
-namespace crstl
+namespace xrstl
 {
 	// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 	template<typename T>
@@ -93,7 +93,7 @@ namespace crstl
 			m_data[0] = v;
 
 			// Set bits in last word to 0 if necessary
-			crstl_constexpr_if(kNumBits & kBitsPerWordMask)
+			xrstl_constexpr_if(kNumBits & kBitsPerWordMask)
 			{
 				m_data[0] &= kLastWordBitMask;
 			}
@@ -162,7 +162,7 @@ namespace crstl
 			memset(m_data, 0xff, sizeof(m_data));
 			
 			// Set bits in last word to 0 if necessary
-			crstl_constexpr_if(kNumBits & kBitsPerWordMask)
+			xrstl_constexpr_if(kNumBits & kBitsPerWordMask)
 			{
 				m_data[kNumWords - 1] &= kLastWordBitMask;
 			}

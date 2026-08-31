@@ -4,7 +4,7 @@
 
 #include "atomic.h"
 
-namespace crstl
+namespace xrstl
 {
 	template<typename T>
 	void intrusive_ptr_add_ref(T* ptr)
@@ -30,7 +30,7 @@ namespace crstl
 
 		intrusive_ptr() = default;
 
-		intrusive_ptr(T* ptr) crstl_noexcept : m_ptr(ptr)
+		intrusive_ptr(T* ptr) xrstl_noexcept : m_ptr(ptr)
 		{
 			if (ptr)
 			{
@@ -38,7 +38,7 @@ namespace crstl
 			}
 		}
 
-		intrusive_ptr(const intrusive_ptr<T>& ptr) crstl_noexcept : m_ptr(ptr.m_ptr)
+		intrusive_ptr(const intrusive_ptr<T>& ptr) xrstl_noexcept : m_ptr(ptr.m_ptr)
 		{
 			if (m_ptr != nullptr)
 			{
@@ -46,12 +46,12 @@ namespace crstl
 			}
 		}
 
-		intrusive_ptr(intrusive_ptr<T>&& ptr) crstl_noexcept : m_ptr(ptr.m_ptr)
+		intrusive_ptr(intrusive_ptr<T>&& ptr) xrstl_noexcept : m_ptr(ptr.m_ptr)
 		{
 			ptr.m_ptr = nullptr;
 		}
 
-		~intrusive_ptr() crstl_noexcept
+		~intrusive_ptr() xrstl_noexcept
 		{
 			if (m_ptr)
 			{
@@ -59,7 +59,7 @@ namespace crstl
 			}
 		}
 
-		intrusive_ptr& operator = (T* ptr) crstl_noexcept
+		intrusive_ptr& operator = (T* ptr) xrstl_noexcept
 		{
 			if (m_ptr != ptr)
 			{
@@ -84,7 +84,7 @@ namespace crstl
 			return *this;
 		}
 
-		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr) crstl_noexcept
+		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr) xrstl_noexcept
 		{
 			if (m_ptr != ptr.m_ptr)
 			{
@@ -109,7 +109,7 @@ namespace crstl
 			return *this;
 		}
 
-		intrusive_ptr& operator = (intrusive_ptr<T>&& ptr) crstl_noexcept
+		intrusive_ptr& operator = (intrusive_ptr<T>&& ptr) xrstl_noexcept
 		{
 			if (m_ptr != ptr.m_ptr)
 			{
@@ -130,22 +130,22 @@ namespace crstl
 			return *this;
 		}
 
-		T* get() const crstl_noexcept { return m_ptr; }
+		T* get() const xrstl_noexcept { return m_ptr; }
 
-		T* operator ->() const crstl_noexcept
+		T* operator ->() const xrstl_noexcept
 		{
 			return m_ptr;
 		}
 
 		typedef T* (intrusive_ptr<T>::*boolean)() const;
 
-		operator boolean() const crstl_noexcept
+		operator boolean() const xrstl_noexcept
 		{
 			// Return anything that isn't easily castable but is guaranteed to be non-null, such as the get function pointer
 			return m_ptr ? &intrusive_ptr<T>::get : nullptr;
 		}
 
-		bool operator!() const crstl_noexcept
+		bool operator!() const xrstl_noexcept
 		{
 			return (m_ptr == nullptr);
 		}
@@ -174,7 +174,7 @@ namespace crstl
 			return m_refcount;
 		}
 
-		crstl::atomic<int32_t> m_refcount;
+		xrstl::atomic<int32_t> m_refcount;
 	};
 
 	class intrusive_ptr_interface_delete : public intrusive_ptr_interface_base
