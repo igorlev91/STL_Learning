@@ -2,6 +2,8 @@
 
 #include "config.h"
 
+#include "xrstldef.h"
+
 #include "atomic.h"
 
 namespace xrstl
@@ -28,7 +30,9 @@ namespace xrstl
 	{
 	public:
 
-		intrusive_ptr() = default;
+		intrusive_ptr() xrstl_noexcept : m_ptr(nullptr) {}
+
+		intrusive_ptr(xrstl::nullptr_t) xrstl_noexcept : m_ptr(nullptr) {}
 
 		intrusive_ptr(T* ptr) xrstl_noexcept : m_ptr(ptr)
 		{
@@ -59,53 +63,21 @@ namespace xrstl
 			}
 		}
 
+		intrusive_ptr& operator = (xrstl::nullptr_t) xrstl_noexcept
+		{
+			set_pointer(nullptr);
+			return *this;
+		}
+
 		intrusive_ptr& operator = (T* ptr) xrstl_noexcept
 		{
-			if (m_ptr != ptr)
-			{
-				T* const ptr_temp = m_ptr;
-
-				// Add a reference to the new pointer
-				if (ptr)
-				{
-					intrusive_ptr_add_ref(ptr);
-				}
-
-				// Assign to member pointer
-				m_ptr = ptr;
-
-				// Release reference from the old pointer we used to hold on to
-				if (ptr_temp)
-				{
-					intrusive_ptr_release(ptr_temp);
-				}
-			}
-
+			set_pointer(ptr);
 			return *this;
 		}
 
 		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr) xrstl_noexcept
 		{
-			if (m_ptr != ptr.m_ptr)
-			{
-				T* const ptr_temp = m_ptr;
-
-				// Add a reference to the new pointer
-				if (ptr.m_ptr)
-				{
-					intrusive_ptr_add_ref(ptr.m_ptr);
-				}
-
-				// Assign to member pointer
-				m_ptr = ptr.m_ptr;
-
-				// Release reference from the old pointer we used to hold on to
-				if (ptr_temp)
-				{
-					intrusive_ptr_release(ptr_temp);
-				}
-			}
-
+			set_pointer(ptr);
 			return *this;
 		}
 
@@ -152,7 +124,30 @@ namespace xrstl
 
 	private:
 
-		T* m_ptr = nullptr;
+		void set_pointer(T* ptr)
+		{
+			if (m_ptr != ptr)
+			{
+				T* const ptr_temp = m_ptr;
+
+				// Add a reference to the new pointer
+				if (ptr)
+				{
+					intrusive_ptr_add_ref(ptr);
+				}
+
+				// Assign to member pointer
+				m_ptr = ptr;
+
+				// Release reference from the old pointer we used to hold on to
+				if (ptr_temp)
+				{
+					intrusive_ptr_release(ptr_temp);
+				}
+			}
+		}
+
+		T* m_ptr;
 	};
 
 	// Simple interface for intrusive_ptr. If there is need for more advanced behavior,
