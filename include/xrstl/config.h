@@ -1,5 +1,25 @@
 #pragma once
 
+#if defined(_MSVC_LANG)
+
+	#define xrstl_cppversion _MSVC_LANG
+
+#elif defined(__cplusplus)
+
+	#define xrstl_cppversion __cplusplus
+
+#endif
+
+#if defined(__clang__) || defined(__GNUG__)
+
+	#define xrstl_finline inline __attribute__((always_inline))
+
+#elif defined(_MSC_VER)
+
+	#define xrstl_finline __forceinline
+
+#endif
+
 #if defined(__cpp_if_constexpr)
 
 	#define xrstl_constexpr constexpr
@@ -47,10 +67,11 @@
 
 #endif
 
-#define xrstl_ENABLE_ASSERT
-#if __cplusplus == 201402L || _MSVC_LANG == 201402L
+#if xrstl_cppversion == 201402L
 	#define xrstl_VARIADIC_TEMPLATES
 #endif
+
+#define xrstl_ENABLE_ASSERT
 
 #if defined(xrstl_ENABLE_ASSERT)
 
