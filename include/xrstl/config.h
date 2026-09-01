@@ -10,6 +10,20 @@
 
 #endif
 
+#if defined(__clang__)
+
+	#define xrstl_CLANG
+
+#elif defined(__GNUG__)
+
+	#define xrstl_GCC
+
+#elif defined(_MSC_VER)
+
+	#define xrstl_MSVC
+
+#endif
+
 #if defined(__clang__) || defined(__GNUG__)
 
 	#define xrstl_finline inline __attribute__((always_inline))
@@ -89,5 +103,25 @@ inline void xrstl_assert_impl(bool condition)
 #else
 
 #define xrstl_assert(x)
+
+#endif
+
+#if defined(_M_ARM) || defined(__arm__) || defined(_M_ARM64) || defined(__aarch64__)
+
+	#define xrstl_ARM
+
+#elif defined(_WIN32)
+
+	#define xrstl_X86_64
+
+#endif
+
+#if defined(_WIN32)
+
+	#define xrstl_WINDOWS
+
+#elif defined(__linux__)
+
+	#define xrstl_LINUX
 
 #endif
