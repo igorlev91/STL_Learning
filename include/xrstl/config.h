@@ -81,7 +81,7 @@
 
 #endif
 
-#if xrstl_cppversion == 201402L
+#if xrstl_cppversion >= 201402L
 	#define xrstl_VARIADIC_TEMPLATES
 #endif
 

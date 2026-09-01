@@ -12,7 +12,7 @@
 
 namespace xrstl
 {
-	template<typename T, uint64_t NumElements>
+	template<typename T, size_t NumElements>
 	class fixed_vector
 	{
 	public:
@@ -44,24 +44,24 @@ namespace xrstl
 			}
 		}
 
-		fixed_vector(const this_type& v) { *this = v; }
-		fixed_vector(this_type&& v) xrstl_noexcept { *this = v; }
+		fixed_vector(const this_type& other) { *this = other; }
+		fixed_vector(this_type&& other) xrstl_noexcept { *this = other; }
 
 		~fixed_vector() xrstl_noexcept
 		{
 			clear();
 		}
 
-		this_type& operator = (const this_type& v) xrstl_noexcept
+		this_type& operator = (const this_type& other) xrstl_noexcept
 		{
-			memcpy(m_data, v.m_data, sizeof(m_data));
+			memcpy(this, &other, sizeof(other));
 			return *this;
 		}
 
-		this_type& operator = (this_type&& v) xrstl_noexcept
+		this_type& operator = (this_type&& other) xrstl_noexcept
 		{
-			xrstl::swap(m_length, v.m_length);
-			xrstl::swap(m_data, v.m_data);
+			xrstl::swap(m_length, other.m_length);
+			xrstl::swap(m_data, other.m_data);
 			return *this;
 		}
 
@@ -91,7 +91,7 @@ namespace xrstl
 		const_pointer data() const { return &m_data[0]; }
 
 #if defined(xrstl_VARIADIC_TEMPLATES)
-		template<class... Args>
+		template<typename... Args>
 		reference emplace_back(Args&&... args)
 		{
 			xrstl_assert(m_length < NumElements);
@@ -188,6 +188,10 @@ namespace xrstl
 			m_length--;
 		}
 
+		//----------
+		// push_back
+		//----------
+
 		reference push_back()
 		{
 			xrstl_assert(m_length < NumElements);
@@ -204,7 +208,7 @@ namespace xrstl
 
 		void push_back(const T& v)
 		{
-			::new((void*)&m_data[m_length]) T(xrstl::move(v));
+			::new((void*)&m_data[m_length]) T(v);
 			m_length++;
 		}
 
@@ -214,24 +218,48 @@ namespace xrstl
 			m_length++;
 		}
 
-		void resize(size_t s)
+		//-------
+		// resize
+		//-------
+
+		void resize(size_t length)
 		{
-			if (s > (size_t)m_length)
+			if ((size_t)m_length < length)
 			{
-				for (uint64_t i = 0; i < s; ++i)
+				for (size_t i = m_length; i < length; ++i)
 				{
 					::new((void*)&m_data[i]) T();
 				}
 			}
-			else if (s < (size_t)m_length)
+			else if ((size_t)m_length > length)
 			{
-				for (uint64_t i = s; s < m_length; ++i)
+				for (size_t i = length; i < m_length; ++i)
 				{
 					m_data[i].~T();
 				}
 			}
 
-			m_length = (uint32_t)s;
+			m_length = (uint32_t)length;
+		}
+
+		void resize(size_t length, const T& value)
+		{
+			if ((size_t)m_length < length)
+			{
+				for (size_t i = m_length; i < length; ++i)
+				{
+					::new((void*)&m_data[i]) T(value);
+				}
+			}
+			else if ((size_t)m_length > length)
+			{
+				for (size_t i = length; i < m_length; ++i)
+				{
+					m_data[i].~T();
+				}
+			}
+
+			m_length = (uint32_t)length;
 		}
 
 		size_t size() const { return m_length; }
@@ -247,25 +275,25 @@ namespace xrstl
 			}
 			else // Otherwise copy it in chunks, all on the stack
 			{
-				uint64_t chunks   = (sizeof(this_type) + kMaxStack - 1) / kMaxStack;
+				size_t chunks   = (sizeof(this_type) + kMaxStack - 1) / kMaxStack;
 				uint8_t* vData    = reinterpret_cast<uint8_t*>(&v);
 				uint8_t* thisData = reinterpret_cast<uint8_t*>(this);
 
 				for (uint32_t c = 0; c < chunks - 1; ++c)
 				{
 					uint8_t chunkData[kMaxStack];
-					uint64_t chunkOffset = c * kMaxStack;
+					size_t chunkOffset = c * kMaxStack;
 					memcpy(chunkData, vData + chunkOffset, kMaxStack);
 					memcpy(vData + chunkOffset, thisData + chunkOffset, kMaxStack);
 					memcpy(thisData + chunkOffset, chunkData, kMaxStack);
 				}
 
-				static const uint64_t kChunkCount = (sizeof(this_type) + kMaxStack - 1) / kMaxStack;
-				static const uint64_t kChunkRemaining = sizeof(this_type) - (kChunkCount - 1) * kMaxStack;
+				static const size_t kChunkCount = (sizeof(this_type) + kMaxStack - 1) / kMaxStack;
+				static const size_t kChunkRemaining = sizeof(this_type) - (kChunkCount - 1) * kMaxStack;
 
 				// Copy last chunk
 				uint8_t chunkData[kMaxStack];
-				uint64_t chunkOffset = (chunks - 1) * kMaxStack;
+				size_t chunkOffset = (chunks - 1) * kMaxStack;
 				memcpy(chunkData, vData + chunkOffset, kChunkRemaining);
 				memcpy(vData + chunkOffset, thisData + chunkOffset, kChunkRemaining);
 				memcpy(thisData + chunkOffset, chunkData, kChunkRemaining);

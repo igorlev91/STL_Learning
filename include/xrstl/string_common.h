@@ -6,6 +6,15 @@
 
 #include "xrstldef.h"
 
+// This include is very cheap in compile times and hard
+// to get right outside of its actual implementation
+#include <stdarg.h>
+
+extern "C"
+{
+	xrstl_1600_dllimport int vsnprintf(char* s, xrstl::size_t n, const char* format, va_list arg);
+}
+
 namespace xrstl
 {
 	inline size_t string_length(const char* str)
@@ -51,13 +60,39 @@ namespace xrstl
 		}
 	}
 
-	size_t string_clamp_length(size_t maxLength, size_t pos, size_t length)
+	template<typename T>
+	inline xrstl_constexpr int string_comparei(const T* string1, size_t length1, const T* string2, size_t length2)
+	{
+		if (length1 == length2)
+		{
+			while (length1 != 0)
+			{
+				T char1 = (T)tolower(*string1), char2 = (T)tolower(*string2);
+				if (char1 != char2)
+				{
+					return char1 < char2 ? -1 : 1;
+				}
+
+				string1++;
+				string2++;
+				length1--;
+			}
+
+			return 0;
+		}
+		else
+		{
+			return length1 < length2 ? -1 : 1;
+		}
+	}
+
+	inline size_t string_clamp_length(size_t maxLength, size_t pos, size_t length)
 	{
 		return length > maxLength - pos ? maxLength - pos : length;
 	}
 
 	template<typename T>
-	inline const char* string_find_char(const T* string, T c, size_t n)
+	inline const T* string_find_char(const T* string, T c, size_t n)
 	{
 		for(const T* ptr = string; ptr != string + n; ++ptr)
 		{
@@ -85,6 +120,40 @@ namespace xrstl
 	}
 
 	template<typename T>
+	const T* string_find_of(const T* string, size_t n, const T* needles, size_t needle_length)
+	{
+		for (const T* ptr = string; ptr != string + n; ++ptr)
+		{
+			for (const T* ptr2 = needles; ptr2 != needles + needle_length; ++ptr2)
+			{
+				if (*ptr == *ptr2)
+				{
+					return ptr;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
+	const T* string_rfind_of(const T* string, size_t n, const T* needles, size_t needle_length)
+	{
+		for (const T* ptr = string; ptr != string - n; --ptr)
+		{
+			for (const T* ptr2 = needles; ptr2 != needles + needle_length; ++ptr2)
+			{
+				if (*ptr == *ptr2)
+				{
+					return ptr;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
 	inline const T* string_find(const T* string, size_t length, const T* needle_string, size_t needle_length)
 	{
 		if (needle_string == nullptr || needle_length > length)
@@ -100,7 +169,6 @@ namespace xrstl
 
 		// No point searching if length of needle is longer than the final characters of the string
 		const T* search_end = string + (length - needle_length) + 1;
-		const T* string_end = string + length;
 		const T* search_start = string;
 
 		while (search_start)
@@ -223,7 +291,7 @@ namespace xrstl
 		{ 0xF8, 0xF0 }  // 11110xxx
 	};
 
-	inline int utf8_bytes(codepoint_t codepoint)
+	inline size_t utf8_bytes(codepoint_t codepoint)
 	{
 		if (codepoint <= UTF8_1_Max)
 			return 1;
@@ -293,7 +361,7 @@ namespace xrstl
 			offset++;
 		}
 
-		int size_bytes = utf8_bytes(codepoint);
+		size_t size_bytes = utf8_bytes(codepoint);
 
 		// Incorrect length used 
 		if(size_bytes != encoding_length || codepoint > UnicodeMax)
@@ -357,7 +425,7 @@ namespace xrstl
 
 	inline size_t encode_utf8(codepoint_t codepoint, utf8_t* utf8, size_t length, size_t offset)
 	{
-		int size_bytes = utf8_bytes(codepoint);
+		size_t size_bytes = utf8_bytes(codepoint);
 
 		// Not enough space
 		if (offset + size_bytes > length)
@@ -366,9 +434,9 @@ namespace xrstl
 		}
 
 		// Write the continuation bytes in reverse order first
-		for (int i = size_bytes - 1; i > 0; i--)
+		for (size_t i = size_bytes - 1; i > 0; i--)
 		{
-			utf8_t cont = codepoint & ~ContinuationMask;
+			utf8_t cont = (utf8_t)(codepoint & ~ContinuationMask);
 			cont |= ContinuationValue;
 
 			utf8[offset + i] = cont;
@@ -396,7 +464,7 @@ namespace xrstl
 
 		if (codepoint <= BasicMultilingualPlaneEnd)
 		{
-			utf16[offset] = codepoint;
+			utf16[offset] = (utf16_t)codepoint;
 			return 1;
 		}
 
@@ -428,7 +496,7 @@ namespace xrstl
 	// Return value is success
 	// Number of bytes written goes into sizeBytes
 
-	bool decode_chunk(char*& dstStart, const char* dstEnd, const wchar_t*& srcStart, const wchar_t* srcEnd, size_t& sizeBytes)
+	inline bool decode_chunk(char*& dstStart, const char* dstEnd, const wchar_t*& srcStart, const wchar_t* srcEnd, size_t& sizeBytes)
 	{
 		size_t srcSize = (size_t)(srcEnd - srcStart);
 		size_t dstSize = (size_t)(dstEnd - dstStart);
@@ -449,7 +517,7 @@ namespace xrstl
 		return utf16Offset == srcSize;
 	}
 
-	bool decode_chunk(wchar_t*& dstStart, const wchar_t* dstEnd, const char*& srcStart, const char* srcEnd, size_t& sizeBytes)
+	inline bool decode_chunk(wchar_t*& dstStart, const wchar_t* dstEnd, const char*& srcStart, const char* srcEnd, size_t& sizeBytes)
 	{
 		size_t srcSize = (size_t)(srcEnd - srcStart);
 		size_t dstSize = (size_t)(dstEnd - dstStart);

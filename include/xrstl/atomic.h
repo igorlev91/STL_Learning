@@ -4,8 +4,12 @@
 
 #include "xrstldef.h"
 
-#if defined(_WIN32)
-#include "atomic_win32.h"
+#if defined(xrstl_WINDOWS)
+#include "xrstl/platform/atomic_win32.h"
+#elif defined(xrstl_ARM)
+#include "xrstl/platform/atomic_arm.h"
+#elif defined(__linux__)
+#include "xrstl/platform/atomic_linux.h"
 #endif
 
 namespace xrstl

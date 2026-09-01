@@ -9,23 +9,36 @@
 // Some functions are well defined across compilers, whereas some are poorly defined such as memchr and wmemchr
 // which is unfortunate. We'll provide our own implementations of these instead
 
+#if defined(_MSC_VER)
+	#define xrstl_dllimport __declspec(dllimport)
+
+	#if _MSC_VER <= 1600
+	#define xrstl_1600_dllimport __declspec(dllimport)
+	#endif
+#else
+	#define xrstl_dllimport
+#endif
+
+#if !defined(xrstl_dllimport)
+	#define xrstl_dllimport
+#endif
+
+#if !defined(xrstl_1600_dllimport)
+	#define xrstl_1600_dllimport
+#endif
+
 extern "C"
 {
 	xrstl::size_t strlen(const char* str);
 	void* memset(void* dst, int val, xrstl::size_t size);
 	void* memcpy(void* destination, void const* source, xrstl::size_t size);
 
-#if defined(_MSC_VER)
-	__declspec(dllimport)
-#endif
-	xrstl::size_t wcslen(const wchar_t* str);
-	wchar_t* wmemset(wchar_t* ptr, wchar_t wc, xrstl::size_t num);
-}
+	xrstl_dllimport xrstl::size_t wcslen(const wchar_t* str);
 
-extern "C"
-{
-#if defined(_MSC_VER) && _MSC_VER <= 1600
-	__declspec(dllimport)
-#endif
-	void* memmove(void* destination, const void* source, xrstl::size_t num);
+	wchar_t* wmemset(wchar_t* ptr, wchar_t wc, xrstl::size_t num);
+
+	xrstl_1600_dllimport void* memmove(void* destination, const void* source, xrstl::size_t num);
+
+	xrstl_dllimport int tolower(int c);
+	xrstl_dllimport int toupper(int c);
 }

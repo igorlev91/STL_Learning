@@ -34,7 +34,7 @@ namespace xrstl
 
 		xrstl_constexpr bool operator == (const pair& other) const { return first == other.first && second == other.second; }
 		xrstl_constexpr bool operator != (const pair& other) const { return !(*this == other); }
-		xrstl_constexpr bool operator < (const pair& other) const { return first < other.first || !(first < other.first) && second < other.second; }
+		xrstl_constexpr bool operator < (const pair& other) const { return first < other.first || (!(first < other.first) && second < other.second); }
 		xrstl_constexpr bool operator <= (const pair& other) const { return !(other < *this); }
 		xrstl_constexpr bool operator > (const pair& other) const { return other < *this; }
 		xrstl_constexpr bool operator >= (const pair& other) const { return !(*this < other); }

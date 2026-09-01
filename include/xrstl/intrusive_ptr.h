@@ -77,7 +77,7 @@ namespace xrstl
 
 		intrusive_ptr& operator = (const intrusive_ptr<T>& ptr) xrstl_noexcept
 		{
-			set_pointer(ptr);
+			set_pointer(ptr.m_ptr);
 			return *this;
 		}
 
