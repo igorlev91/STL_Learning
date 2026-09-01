@@ -35,9 +35,22 @@ namespace xrstl
 		// debug later on and would rely on a natvis to properly visualize it
 
 		fixed_vector() xrstl_noexcept : m_length(0) {}
-		~fixed_vector() xrstl_noexcept {}
+		fixed_vector(size_t initialLength) : m_length(0)
+		{
+			xrstl_assert(initialLength < NumElements);
+			for (size_t i = 0; i < initialLength; ++i)
+			{
+				push_back();
+			}
+		}
+
 		fixed_vector(const this_type& v) { *this = v; }
 		fixed_vector(this_type&& v) xrstl_noexcept { *this = v; }
+
+		~fixed_vector() xrstl_noexcept
+		{
+			clear();
+		}
 
 		this_type& operator = (const this_type& v) xrstl_noexcept
 		{
